@@ -1,0 +1,77 @@
+---
+title: "Getting started with DepGEM"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{getting-started}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Load the package and its dependencies
+
+```{r setup}
+library(entropy)
+library(mvtnorm)
+library(DepGEM)
+library(tidyverse)
+```
+
+# Load in the data
+
+```{r}
+data("data")
+data
+```
+
+
+# Code for posterior sampling in the DepGEM model
+
+```{r}
+set.seed(191118)
+gibbs_output <- gibbs(n.iter=13, Y = Y, X = X_jitter,  cat = "",
+      burnin_coef = 0.5,
+      sigma_Z_max = 5, sigma_Z_0 = 1, a_Z = 1, b_Z = 1,
+      M_min = 0, M_max = 50, a_M = 1, b_M = .1,
+      a_lambda = .2, b_lambda = .01,
+      lambda_min = .01, lambda_max = .4, lambda_0 = 3, GP = "SE")
+gibbs_output %>% names
+# load(file=paste("estimations/save_estimate_",cat,".rdata",sep=""))
+predictive_output <- predictive(Xs = Xs, 
+           X = X_jitter, 
+           Z_store = gibbs_output$Z_store, 
+           lambda_store = gibbs_output$lambda_store,
+           sigma_Z_store = gibbs_output$sigma_Z_store, 
+           M_store = gibbs_output$M_store, 
+           d_store = gibbs_output$d_store, 
+           D_store = gibbs_output$D_store, 
+           by_burn = 2,
+           cat = "")
+# load(file=paste("estimations/save_pred_",cat,".rdata",sep=""))
+```
+
+# plot estimated curve and credible intervals
+```{r}
+plot_diversity_fun(X, Xs, gibbs_output$D_store, predictive_output$D_star, D_data)
+```
+
+# Running until convergence
+
+The above example was to show you how it works; but is probably insufficient to get the algorithm to converge. Here's a verified example with enough iterations to converge (not run)
+
+```{r, eval=FALSE}
+gibbs(n.iter=10^3, 
+      Y = Y, X = X_jitter,  cat = "",
+      burnin_coef = 0.5,
+      sigma_Z_max = 5, sigma_Z_0 = 1, a_Z = 1, b_Z = 1,
+      M_min = 0, M_max = 50, a_M = 1, b_M = .1,
+      a_lambda = .2, b_lambda = .01,
+      lambda_min = .01, lambda_max = .4, lambda_0 = 3, GP = "SE")
+
+```

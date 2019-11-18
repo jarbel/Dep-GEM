@@ -1,0 +1,23 @@
+Package: DepGEM
+Type: Package
+Title: The Dep-GEM estimator 
+Version: 0.1.0
+Authors@R: as.person(c(
+    "Amy Willis <adwillis@uw.edu> [aut, cre]",
+    "Julyan Arbel <julyan.arbel@inria.fr> [aut]"
+  ))
+Description: Bayesian nonparametric model for species-by-site (covariate-dependent) data.
+Depends: R (>= 3.4.2)
+License: GPL (>= 2)
+Imports:
+    entropy,
+    mvtnorm,
+    stats,
+    tidyverse
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
